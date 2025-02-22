@@ -6,7 +6,8 @@ import speech_recognition as sr
 from groq import Groq
 
 # Initialize Groq client with API key
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = Groq(api_key="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")
 
 # List of daily topics
 topics = [
