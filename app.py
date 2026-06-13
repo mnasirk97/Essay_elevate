@@ -1,88 +1,88 @@
 # code 01
-import os
-import streamlit as st
-import random
-import speech_recognition as sr
-import matplotlib.pyplot as plt
-from groq import Groq
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
-from googletrans import Translator
+# import os
+# import streamlit as st
+# import random
+# import speech_recognition as sr
+# import matplotlib.pyplot as plt
+# from groq import Groq
+# from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
+# from googletrans import Translator
 
-# Initialize Groq client with API key
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-translator = Translator()
+# # Initialize Groq client with API key
+# client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# translator = Translator()
 
-# Sample Topics & AI Writing Samples
-topics = [
-    "Technology has made life easier or more complicated? Discuss both views.",
-    "Should governments invest more in public transport?",
-    "Does social media harm face-to-face communication?",
-    "Should plastic be banned? Pros and Cons."
-]
-writing_samples = {
-    "A1": "Technology is good. We use it every day. It helps us.",
-    "B1": "Technology has both advantages and disadvantages. It makes tasks easier but can also lead to over-reliance.",
-    "C1": "The advent of technology has streamlined numerous aspects of human life, yet it has simultaneously fostered certain dependencies."
-}
+# # Sample Topics & AI Writing Samples
+# topics = [
+#     "Technology has made life easier or more complicated? Discuss both views.",
+#     "Should governments invest more in public transport?",
+#     "Does social media harm face-to-face communication?",
+#     "Should plastic be banned? Pros and Cons."
+# ]
+# writing_samples = {
+#     "A1": "Technology is good. We use it every day. It helps us.",
+#     "B1": "Technology has both advantages and disadvantages. It makes tasks easier but can also lead to over-reliance.",
+#     "C1": "The advent of technology has streamlined numerous aspects of human life, yet it has simultaneously fostered certain dependencies."
+# }
 
-# UI Sidebar
-st.sidebar.title("📌 Navigation")
-page = st.sidebar.radio("Go to", ["Daily Challenge", "Writing Feedback", "Leaderboard", "AI Writing Samples"])
+# # UI Sidebar
+# st.sidebar.title("📌 Navigation")
+# page = st.sidebar.radio("Go to", ["Daily Challenge", "Writing Feedback", "Leaderboard", "AI Writing Samples"])
 
-# Daily Topic & Writing Streak
-if page == "Daily Challenge":
-    st.title("🎯 Daily Writing Challenge")
-    today_topic = random.choice(topics)
-    st.info(f"📌 **Today's Topic:** {today_topic}")
-    if "streak" not in st.session_state:
-        st.session_state.streak = 0
-    st.sidebar.write(f"🔥 Streak: {st.session_state.streak} days")
+# # Daily Topic & Writing Streak
+# if page == "Daily Challenge":
+#     st.title("🎯 Daily Writing Challenge")
+#     today_topic = random.choice(topics)
+#     st.info(f"📌 **Today's Topic:** {today_topic}")
+#     if "streak" not in st.session_state:
+#         st.session_state.streak = 0
+#     st.sidebar.write(f"🔥 Streak: {st.session_state.streak} days")
 
-# Real-Time Voice Input
-if page == "Writing Feedback":
-    st.title("📝 AI Writing Feedback")
-    language = st.selectbox("Choose Language", ["English", "Urdu", "French"])
-    essay = st.text_area("✍️ Write your essay here", height=200)
+# # Real-Time Voice Input
+# if page == "Writing Feedback":
+#     st.title("📝 AI Writing Feedback")
+#     language = st.selectbox("Choose Language", ["English", "Urdu", "French"])
+#     essay = st.text_area("✍️ Write your essay here", height=200)
     
-    st.subheader("🎙️ Speak Your Essay")
-    webrtc_ctx = webrtc_streamer(key="speech-to-text", mode=WebRtcMode.SENDRECV)
-    if webrtc_ctx.audio_receiver:
-        recognizer = sr.Recognizer()
-        with sr.AudioFile("input_audio.wav") as source:
-            audio = recognizer.record(source)
-            try:
-                essay = recognizer.recognize_google(audio)
-                st.write("Recognized Text:", essay)
-            except:
-                st.write("Could not recognize speech.")
+#     st.subheader("🎙️ Speak Your Essay")
+#     webrtc_ctx = webrtc_streamer(key="speech-to-text", mode=WebRtcMode.SENDRECV)
+#     if webrtc_ctx.audio_receiver:
+#         recognizer = sr.Recognizer()
+#         with sr.AudioFile("input_audio.wav") as source:
+#             audio = recognizer.record(source)
+#             try:
+#                 essay = recognizer.recognize_google(audio)
+#                 st.write("Recognized Text:", essay)
+#             except:
+#                 st.write("Could not recognize speech.")
     
-    level = st.selectbox("Select Your Level", ["A1", "A2", "B1", "B2", "C1"])
+#     level = st.selectbox("Select Your Level", ["A1", "A2", "B1", "B2", "C1"])
     
-    if st.button("🚀 Submit for Feedback"):
-        feedback = client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": "Provide grammar, cohesion, and vocabulary feedback."},
-                {"role": "user", "content": essay}
-            ],
-            model="llama3-8b-8192",
-        )
-        translated_feedback = translator.translate(feedback.choices[0].message.content, dest=language).text
-        st.subheader("🔍 Feedback:")
-        st.markdown(translated_feedback, unsafe_allow_html=True)
+#     if st.button("🚀 Submit for Feedback"):
+#         feedback = client.chat.completions.create(
+#             messages=[
+#                 {"role": "system", "content": "Provide grammar, cohesion, and vocabulary feedback."},
+#                 {"role": "user", "content": essay}
+#             ],
+#             model="llama3-8b-8192",
+#         )
+#         translated_feedback = translator.translate(feedback.choices[0].message.content, dest=language).text
+#         st.subheader("🔍 Feedback:")
+#         st.markdown(translated_feedback, unsafe_allow_html=True)
     
-# Leaderboard System
-if page == "Leaderboard":
-    st.title("🏆 Top Writers Leaderboard")
-    leaderboard = {"Alice": 15, "Bob": 10, "Charlie": 8}
-    sorted_leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1], reverse=True))
-    for rank, (user, score) in enumerate(sorted_leaderboard.items(), 1):
-        st.write(f"{rank}. **{user}** - {score} Essays")
+# # Leaderboard System
+# if page == "Leaderboard":
+#     st.title("🏆 Top Writers Leaderboard")
+#     leaderboard = {"Alice": 15, "Bob": 10, "Charlie": 8}
+#     sorted_leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1], reverse=True))
+#     for rank, (user, score) in enumerate(sorted_leaderboard.items(), 1):
+#         st.write(f"{rank}. **{user}** - {score} Essays")
 
-# AI Writing Samples
-if page == "AI Writing Samples":
-    st.title("📖 AI-Generated Writing Samples")
-    level = st.selectbox("Choose Proficiency Level", ["A1", "B1", "C1"])
-    st.write(f"✍️ Example Essay for {level}: {writing_samples[level]}")
+# # AI Writing Samples
+# if page == "AI Writing Samples":
+#     st.title("📖 AI-Generated Writing Samples")
+#     level = st.selectbox("Choose Proficiency Level", ["A1", "B1", "C1"])
+#     st.write(f"✍️ Example Essay for {level}: {writing_samples[level]}")
 
 
 # code 00
@@ -93,9 +93,6 @@ if page == "AI Writing Samples":
 # import speech_recognition as sr
 # from groq import Groq
 
-# # Initialize Groq client with API key
-# # client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-# client = Groq(api_key="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")
 
 # # List of daily topics
 # topics = [
